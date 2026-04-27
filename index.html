@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PedusAsistant | PedusCompany Official</title>
+    <style>
+        /* ══════════════════════════════════════════════════════════
+           VARIABLES Y CONFIGURACIÓN BASE
+           ══════════════════════════════════════════════════════════ */
+        :root {
+            --primary-glow: #00f2ff;
+            --secondary-glow: #ff0044;
+            --bg-deep: #020205;
+            --card-bg: rgba(10, 12, 20, 0.9);
+            --text-main: #f0f0f0;
+            --text-dim: #888;
+            --font-tech: 'Segoe UI', Roboto, 'Courier New', monospace;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-tech);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           ANIMACIONES CSS (Aumentan la complejidad y el peso visual)
+           ══════════════════════════════════════════════════════════ */
+        @keyframes cyber-pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100%; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes text-glitch {
+            0% { text-shadow: 2px 0 var(--secondary-glow); }
+            20% { text-shadow: -2px 0 var(--primary-glow); }
+            40% { text-shadow: 2px 2px var(--secondary-glow); }
+            100% { text-shadow: 0 0 5px var(--primary-glow); }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           ESTILOS DE NAVEGACIÓN
+           ══════════════════════════════════════════════════════════ */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--primary-glow);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-glow);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           HERO SECTION (Portada)
+           ══════════════════════════════════════════════════════════ */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0a1525 0%, #020205 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 6rem;
+            margin: 0;
+            color: white;
+            animation: text-glitch 2s infinite;
+            letter-spacing: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--primary-glow);
+            letter-spacing: 5px;
+            margin-bottom: 30px;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           TERMINAL DE COMANDOS (Visual)
+           ══════════════════════════════════════════════════════════ */
+        .terminal {
+            width: 90%;
+            max-width: 900px;
+            background: #000;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #333;
+            font-family: 'Courier New', Courier, monospace;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin-top: 20px;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .code-line {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0;
+            animation: fadeIn 0.1s forwards;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* ══════════════════════════════════════════════════════════
+           CATÁLOGO DE VERSIONES (El corazón de PedusAsistant)
+           ══════════════════════════════════════════════════════════ */
+        .catalog-section {
+            padding: 100px 50px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            color: var(--primary-glow);
+            margin-bottom: 10px;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .version-card {
+            background: var(--card-bg);
+            border: 1px solid #222;
+            padding: 40px;
+            border-radius: 20px;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .version-card:hover {
+            border-color: var(--primary-glow);
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-glow);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .card-tag.pro { background: var(--primary-glow); color: black; }
+
+        .version-card h3 {
+            font-size: 2rem;
+            margin: 0 0 15px 0;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .features-list li {
+            margin-bottom: 10px;
+            color: #ccc;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .features-list li::before {
+            content: "▹";
+            color: var(--primary-glow);
+            margin-right: 10px;
+        }
+
+        .btn-card {
+            background: transparent;
+            border: 1px solid var(--primary-glow);
+            color: var(--primary-glow);
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-card:hover {
+            background: var(--primary-glow);
+            color: black;
+        }
+
+        .locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           MÉTRICAS TÉCNICAS (Presumiendo las 2276 líneas)
+           ══════════════════════════════════════════════════════════ */
+        .tech-stats {
+            background: linear-gradient(180deg, var(--bg-deep) 0%, #0a0a15 100%);
+            padding: 100px 50px;
+            text-align: center;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box h4 {
+            font-size: 4rem;
+            margin: 0;
+            color: var(--primary-glow);
+        }
+
+        .stat-box p {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           SECCIÓN DE DESCARGA
+           ══════════════════════════════════════════════════════════ */
+        .download-area {
+            padding: 150px 50px;
+            text-align: center;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMzMzMiIGZpbGwtb3BhY2l0eT0iMC40Ii8+PC9zdmc+');
+        }
+
+        .download-btn-massive {
+            padding: 25px 80px;
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--primary-glow), #00a2ff);
+            color: black;
+            border: none;
+            border-radius: 100px;
+            font-weight: 900;
+            text-decoration: none;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.4);
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .download-btn-massive:hover {
+            transform: scale(1.1) rotate(-1deg);
+            box-shadow: 0 0 80px var(--primary-glow);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           FOOTER
+           ══════════════════════════════════════════════════════════ */
+        footer {
+            padding: 80px 50px;
+            border-top: 1px solid #111;
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        .footer-brand {
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            margin: 20px 0;
+        }
+
+        .footer-links a {
+            color: #555;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           RESPONSIVE
+           ══════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .nav-links { display: none; }
+            .stats-container { gap: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">PEDUSASISTANT</div>
+        <div class="nav-links">
+            <a href="#hero">Inicio</a>
+            <a href="#catalog">Catálogo</a>
+            <a href="#specs">Especificaciones</a>
+            <a href="#download">Descargar</a>
+        </div>
+    </nav>
+
+    <section class="hero" id="hero">
+        <h1 class="hero-title">PEDUS</h1>
+        <div class="hero-subtitle">BY PEDUSCOMPANY</div>
+        
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div id="terminal-content">
+                <div class="code-line" style="animation-delay: 0.2s;">> LOAD CORE_KERNEL_PEDUS... [DONE]</div>
+                <div class="code-line" style="animation-delay: 0.4s;">> INJECTING 2,276 LINES OF PYTHON... [DONE]</div>
+                <div class="code-line" style="animation-delay: 0.6s;">> DEPLOYING V1.1 PRO MODULE... [ACTIVE]</div>
+                <div class="code-line" style="animation-delay: 0.8s;">> SYSTEM READY. WAITING FOR COMMANDS...</div>
+                <div class="code-line" style="animation-delay: 1s; color: var(--primary-glow);">> OK PEDUS, LANZA EL CATÁLOGO...</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="catalog-section" id="catalog">
+        <div class="section-header">
+            <h2>CATÁLOGO DE VERSIONES</h2>
+            <p>Explora la evolución de PedusAsistant. Un motor, infinitas posibilidades.</p>
+        </div>
+
+        <div class="catalog-grid">
+            
+            <div class="version-card">
+                <div class="card-tag pro">DISPONIBLE</div>
+                <div>
+                    <h3>V1.1 PRO</h3>
+                    <p>La versión actual. Estabilidad máxima y control total de hardware.</p>
+                    <ul class="features-list">
+                        <li>Control de Brillo y Volumen</li>
+                        <li>Gestión de 250+ Aplicaciones</li>
+                        <li>Motor de voz Edge-TTS Inteligente</li>
+                        <li>Diagnóstico de Hardware en Tiempo Real</li>
+                        <li>Sistema de Captura de Pantalla Automática</li>
+                    </ul>
+                </div>
+                <a href="#download" class="btn-card">ADQUIRIR VERSIÓN PRO</a>
+            </div>
+
+            <div class="version-card locked">
+                <div class="card-tag">PRÓXIMAMENTE</div>
+                <div>
+                    <h3>V1.2 ULTRA</h3>
+                    <p>Nueva arquitectura de red y procesamiento paralelo.</p>
+                    <ul class="features-list">
+                        <li>Control de Dispositivos IoT</li>
+                        <li>Modo Sigilo Mejorado</li>
+                        <li>Traducción de Voz en Tiempo Real</li>
+                        <li>Integración con API Vision</li>
+                    </ul>
+                </div>
+                <button class="btn-card" disabled>BLOQUEADO</button>
+            </div>
+
+            <div class="version-card locked">
+                <div class="card-tag">DESARROLLO</div>
+                <div>
+                    <h3>V2.0 NEURAL</h3>
+                    <p>La singularidad. Conciencia artificial adaptativa.</p>
+                    <ul class="features-list">
+                        <li>Memoria a Largo Plazo Dinámica</li>
+                        <li>Autocorrección de Código</li>
+                        <li>Interfaz de Pensamiento (Experimental)</li>
+                    </ul>
+                </div>
+                <button class="btn-card" disabled>EN DESARROLLO</button>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="tech-stats" id="specs">
+        <div class="section-header">
+            <h2>MÉTRICAS TÉCNICAS</h2>
+            <p>Diseño masivo. Rendimiento optimizado.</p>
+        </div>
+        <div class="stats-container">
+            <div class="stat-box">
+                <h4>2,276</h4>
+                <p>Líneas de Código Purificadas</p>
+            </div>
+            <div class="stat-box">
+                <h4>250+</h4>
+                <p>Comandos de Aplicación</p>
+            </div>
+            <div class="stat-box">
+                <h4>0.2s</h4>
+                <p>Latencia de Respuesta</p>
+            </div>
+            <div class="stat-box">
+                <h4>∞</h4>
+                <p>Capacidad de Expansión</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="download-area" id="download">
+        <h2 style="font-size: 3rem; margin-bottom: 20px;">ÚNETE A PEDUSCOMPANY</h2>
+        <p style="color: #888; max-width: 600px; margin: 0 auto 50px;">
+            Descarga PedusAsistant v1.1 PRO hoy mismo. El primer paso hacia la automatización total de tu entorno digital.
+        </p>
+        <a href="pedus.exe" class="download-btn-massive" download>DESCARGAR PEDUS.EXE</a>
+        <div style="margin-top: 30px; font-size: 0.8rem; color: #444;">
+            SISTEMA OPERATIVO COMPATIBLE: WINDOWS 10 / 11 (X64)
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-brand">PEDUSCOMPANY</div>
+        <p>Innovando en la intersección del código y la inteligencia artificial.</p>
+        <div class="footer-links">
+            <a href="#">Soporte</a>
+            <a href="#">Privacidad</a>
+            <a href="#">GitHub</a>
+            <a href="#">Términos</a>
+        </div>
+        <p style="margin-top: 40px; color: #333;">
+            &copy; 2026 PedusCompany. Todos los derechos reservados.<br>
+            "El código es la ley, PedusAsistant es el juez."
+        </p>
+    </footer>
+
+    <script>
+        // Efecto de scroll suave para los enlaces
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simulación de escritura en terminal al cargar
+        console.log("PedusAsistant Web Engine Loaded Successfully");
+        console.log("Project: PedusAsistant v1.1 PRO");
+        console.log("Code Base: 2276 lines of Python");
+    </script>
+
+    </body>
+</html>
